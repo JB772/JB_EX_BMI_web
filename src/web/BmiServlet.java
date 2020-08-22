@@ -24,6 +24,7 @@ public class BmiServlet extends HttpServlet{
 	private final static String CONTENT_TYPE = "text/html; charset=UTF-8";
 	private static final Gson GSON = new GsonBuilder().create();
 	private JsonObject jsonIn;
+	private BmiCalculator bmiCalcu;
 	
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -40,13 +41,11 @@ public class BmiServlet extends HttpServlet{
 		String action = jsonIn.get("action").getAsString();
 		String outStr = "";
 		JsonObject jsonOut = new JsonObject();
-		double bmi = 0.0;
 		switch (action) {
 		//action: save
 		case "save":
-			//取出第二層BmiCalculator物件，並且算bmi；然後再回傳{"resultCode":1}；用writeJson()傳回client端
-			BmiCalculator bmiCalcu=GSON.fromJson((jsonIn.get("BmiCalculator").getAsString()),BmiCalculator.class);
-			bmi = new BmiCalculator(bmiCalcu.getDbHeight(), bmiCalcu.getDbWeight()).getBMI();
+			//取出第二層BmiCalculator物件，存在此網頁物件中，然後再回傳{"resultCode":1}；用writeJson()傳回client端
+			bmiCalcu=GSON.fromJson((jsonIn.get("BmiCalculator").getAsString()),BmiCalculator.class);
 			jsonOut.addProperty("resultCode", 1);
 			outStr = jsonOut.toString();
 			System.out.println(outStr);
@@ -54,11 +53,13 @@ public class BmiServlet extends HttpServlet{
 			break;
 		//action: get
 		case "get":
-			//分別將{"resultCode":2}及{"bmi":"bmi值"}，存入jsonOut；用writeJson()傳回client端
+			//分別將{"resultCode":2}及{"bmiCalcu":有bmi值的bmiCalcu物件}，存入jsonOut；用writeJson()傳回client端
+			//bmi = bmiCalcu.getBMI();
+			bmiCalcu.getBMI();
 			jsonOut.addProperty("resultCode", 2);
-			jsonOut.addProperty("bmi", bmi);
+			jsonOut.addProperty("bmiCalcu", GSON.toJson(bmiCalcu));
 			outStr = jsonOut.toString();
-			System.out.println(outStr);
+			System.out.println("jsonOut"+outStr);
 			writeJson(resp, outStr);
 			break;
 			
