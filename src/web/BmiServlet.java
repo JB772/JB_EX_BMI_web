@@ -48,7 +48,7 @@ public class BmiServlet extends HttpServlet{
 			bmiCalcu=GSON.fromJson((jsonIn.get("BmiCalculator").getAsString()),BmiCalculator.class);
 			jsonOut.addProperty("resultCode", 1);
 			outStr = jsonOut.toString();
-			System.out.println(outStr);
+			System.out.println("jsonOut"+outStr);
 			writeJson(resp, outStr);
 			break;
 		//action: get
